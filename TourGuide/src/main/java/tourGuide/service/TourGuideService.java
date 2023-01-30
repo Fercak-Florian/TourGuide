@@ -2,11 +2,11 @@ package tourGuide.service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -20,24 +20,29 @@ import gpsUtil.GpsUtil;
 import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
+import rewardCentral.RewardCentral;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.tracker.Tracker;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
+import tourGuide.utils.ProximityAttraction;
 import tripPricer.Provider;
 import tripPricer.TripPricer;
 
 @Service
 public class TourGuideService {
+	
 	private Logger logger = LoggerFactory.getLogger(TourGuideService.class);
 	private final GpsUtil gpsUtil;
+	private final RewardCentral rewardCentral;
 	private final RewardsService rewardsService;
 	private final TripPricer tripPricer = new TripPricer();
 	public final Tracker tracker;
 	boolean testMode = true;
 	
-	public TourGuideService(GpsUtil gpsUtil, RewardsService rewardsService) {
+	public TourGuideService(GpsUtil gpsUtil, RewardCentral rewardCentral, RewardsService rewardsService) {
 		this.gpsUtil = gpsUtil;
+		this.rewardCentral = rewardCentral;
 		this.rewardsService = rewardsService;
 		
 		if(testMode) {
@@ -90,16 +95,27 @@ public class TourGuideService {
 		return visitedLocation;
 	}
 
-	public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation) {
-		List<Attraction> nearbyAttractions = new ArrayList<>();
-		for(Attraction attraction : gpsUtil.getAttractions()) {
-			if(rewardsService.isWithinAttractionProximity(attraction, visitedLocation.location)) {
-				nearbyAttractions.add(attraction);
-			}
-		}
+	public List<ProximityAttraction> getNearByAttractions(VisitedLocation visitedLocation) {
+		/*List<Attraction> nearbyAttractions = new ArrayList<>();*/
+		Map<Attraction, Double> nearestAttractions = new HashMap<>();
 		
-		return nearbyAttractions;
-	}
+		System.out.println("Toutes les distance sont : ");
+		for(Attraction attraction : gpsUtil.getAttractions()) {
+			/*nearbyAttractions.add(attraction);*/
+			nearestAttractions.put(attraction, rewardsService.getDistance(visitedLocation.location, attraction));
+			System.out.println(rewardsService.getDistance(visitedLocation.location, attraction));
+		}
+		System.out.println("Les 5 distances les plus courtes sont : ");
+		return /*new ArrayList<>*/(nearestAttractions.entrySet()
+				.stream()
+				.sorted(Entry.comparingByValue())
+				.limit(5)
+				.map(t -> {
+					System.out.println(t.getValue());
+					return t;
+				})
+				.map(t -> new ProximityAttraction(t.getKey().attractionName, t.getKey().latitude, t.getKey().longitude, visitedLocation.location, t.getValue(), rewardCentral.getAttractionRewardPoints(t.getKey().attractionId, visitedLocation.userId))).collect(Collectors.toList()));
+			}
 	
 	private void addShutDownHook() {
 		Runtime.getRuntime().addShutdownHook(new Thread() { 
