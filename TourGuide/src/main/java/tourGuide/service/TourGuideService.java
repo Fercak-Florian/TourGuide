@@ -2,6 +2,7 @@ package tourGuide.service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,7 @@ import tourGuide.tracker.Tracker;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
 import tourGuide.utils.ProximityAttraction;
+import tourGuide.utils.UserMostRecentLocation;
 import tripPricer.Provider;
 import tripPricer.TripPricer;
 
@@ -64,6 +66,15 @@ public class TourGuideService {
 			user.getLastVisitedLocation() :
 			trackUserLocation(user);
 		return visitedLocation;
+	}
+	
+	public List<UserMostRecentLocation> getAllUsersMostRecentLocation() {
+		List<User> users = getAllUsers();
+		List<UserMostRecentLocation> usersMostRecentLocations = new ArrayList<>();
+		for(User user : users) {
+			usersMostRecentLocations.add(new UserMostRecentLocation(user.getUserId(), user.getLastVisitedLocation().location));
+		}
+		return usersMostRecentLocations;
 	}
 	
 	public User getUser(String userName) {
