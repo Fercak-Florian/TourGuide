@@ -107,24 +107,15 @@ public class TourGuideService {
 	}
 
 	public List<ProximityAttraction> getNearByAttractions(VisitedLocation visitedLocation) {
-		/*List<Attraction> nearbyAttractions = new ArrayList<>();*/
 		Map<Attraction, Double> nearestAttractions = new HashMap<>();
 		
-		System.out.println("Toutes les distance sont : ");
 		for(Attraction attraction : gpsUtil.getAttractions()) {
-			/*nearbyAttractions.add(attraction);*/
 			nearestAttractions.put(attraction, rewardsService.getDistance(visitedLocation.location, attraction));
-			System.out.println(rewardsService.getDistance(visitedLocation.location, attraction));
 		}
-		System.out.println("Les 5 distances les plus courtes sont : ");
-		return /*new ArrayList<>*/(nearestAttractions.entrySet()
+		return (nearestAttractions.entrySet()
 				.stream()
 				.sorted(Entry.comparingByValue())
 				.limit(5)
-				.map(t -> {
-					System.out.println(t.getValue());
-					return t;
-				})
 				.map(t -> new ProximityAttraction(t.getKey().attractionName, t.getKey().latitude, t.getKey().longitude, visitedLocation.location, t.getValue(), rewardCentral.getAttractionRewardPoints(t.getKey().attractionId, visitedLocation.userId))).collect(Collectors.toList()));
 			}
 	
