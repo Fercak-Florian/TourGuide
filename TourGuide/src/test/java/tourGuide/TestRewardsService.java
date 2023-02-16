@@ -4,8 +4,10 @@ import static org.junit.Assert.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -20,9 +22,15 @@ import tourGuide.user.User;
 import tourGuide.user.UserReward;
 
 public class TestRewardsService {
+	
+	@Before
+	public void init() {
+		Locale.setDefault(new Locale("en", "US", "WIN"));
+	}
 
 	@Test
 	public void userGetRewards() {
+		/*ARRANGE*/
 		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 
@@ -32,7 +40,20 @@ public class TestRewardsService {
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		Attraction attraction = gpsUtil.getAttractions().get(0);
 		user.addToVisitedLocations(new VisitedLocation(user.getUserId(), attraction, new Date()));
+		
+		/*ACT*/
 		tourGuideService.trackUserLocation(user);
+		
+		/*ATTENTE DE MODIFICATION DU USER PAR LE THEAD SEPARE*/
+		while(user.getUserRewards().isEmpty()) {
+			try {
+				Thread.sleep(600);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		/*ASSERT*/
 		List<UserReward> userRewards = user.getUserRewards();
 		tourGuideService.tracker.stopTracking();
 		assertTrue(userRewards.size() == 1);
