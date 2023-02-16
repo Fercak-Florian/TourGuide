@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -100,9 +101,12 @@ public class TourGuideService {
 	}
 	
 	public VisitedLocation trackUserLocation(User user) {
-		VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
-		user.addToVisitedLocations(visitedLocation);
-		rewardsService.calculateRewards(user);
+		VisitedLocation visitedLocation = null;
+		CompletableFuture.supplyAsync(() -> gpsUtil.getUserLocation(user.getUserId())).thenAccept(v -> {
+			user.addToVisitedLocations(v);
+			rewardsService.calculateRewards(user);
+		});
+		visitedLocation = user.getLastVisitedLocation();
 		return visitedLocation;
 	}
 
