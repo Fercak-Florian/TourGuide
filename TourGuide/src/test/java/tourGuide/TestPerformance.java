@@ -79,7 +79,7 @@ public class TestPerformance {
 
 		for (User user : allUsers) {
 			while (user.getVisitedLocations().size() <= usersBeforeTracking.get(user)) {
-				System.out.println("waiting for user's update");
+				//System.out.println("waiting for user's update");
 				try {
 					Thread.sleep(10); /* AJUSTER LE TEMPS */
 				} catch (InterruptedException e) {
@@ -102,28 +102,37 @@ public class TestPerformance {
 		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 
-		// Users should be incremented up to 100,000, and test finishes within 20
-		// minutes
-		InternalTestHelper.setInternalUserNumber(100);
+		// Users should be incremented up to 100,000, and test finishes within 20 minutes
+		InternalTestHelper.setInternalUserNumber(100000);
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
-		TourGuideService tourGuideService = new TourGuideService(gpsUtil, new RewardCentral(), rewardsService);
-
-		Attraction attraction = gpsUtil.getAttractions().get(0);
+		TourGuideService tourGuideService = new TourGuideService(gpsUtil, new RewardCentral() ,rewardsService);
+		
+	    Attraction attraction = gpsUtil.getAttractions().get(0);
 		List<User> allUsers = new ArrayList<>();
 		allUsers = tourGuideService.getAllUsers();
 		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
-
-		allUsers.forEach(u -> rewardsService.calculateRewards(u));
-
-		for (User user : allUsers) {
+	    
+	    allUsers.forEach(u -> rewardsService.calculateRewards(u)); /*THREAD SECONDAIRE*/
+	    
+		for(User user : allUsers) {
+			while(user.getUserRewards().isEmpty()) {
+				try {
+					Thread.sleep(1); /*FAIRE VARIER LE TEMPS*/
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		for(User user : allUsers) {
 			assertTrue(user.getUserRewards().size() > 0);
 		}
+		
 		stopWatch.stop();
 		tourGuideService.tracker.stopTracking();
 
-		System.out.println("highVolumeGetRewards: Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime())
-				+ " seconds.");
+		System.out.println("highVolumeGetRewards: Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()) + " seconds."); 
 		assertTrue(TimeUnit.MINUTES.toSeconds(20) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 	}
 

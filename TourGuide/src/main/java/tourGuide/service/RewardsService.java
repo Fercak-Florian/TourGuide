@@ -1,6 +1,7 @@
 package tourGuide.service;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.stereotype.Service;
 
@@ -39,12 +40,16 @@ public class RewardsService {
 	public void calculateRewards(User user) {
 		List<VisitedLocation> userLocations = user.getVisitedLocations();
 		List<Attraction> attractions = gpsUtil.getAttractions();
-		
+		//Executor executor = Executors.newFixedThreadPool(10);
 		for(VisitedLocation visitedLocation : userLocations) {
 			for(Attraction attraction : attractions) {
 				if(user.getUserRewards().stream().filter(r -> r.attraction.attractionName.equals(attraction.attractionName)).count() == 0) {
 					if(nearAttraction(visitedLocation, attraction)) {
-						user.addUserReward(new UserReward(visitedLocation, attraction, getRewardPoints(attraction, user)));
+						/*ENVIRON 1 SECONDE PASSEE DANS getRewardPoints -> TEMPS INCOMPRESSIBLE*/
+						CompletableFuture.supplyAsync(() -> getRewardPoints(attraction, user)/*, executor*/)
+						.thenAccept(rewards -> {
+							user.addUserReward(new UserReward(visitedLocation, attraction, rewards));
+						});
 					}
 				}
 			}
