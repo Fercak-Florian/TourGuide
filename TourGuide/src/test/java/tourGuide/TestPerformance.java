@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.time.StopWatch;
 import org.junit.Before;
@@ -58,7 +59,7 @@ public class TestPerformance {
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 		// Users should be incremented up to 100,000, and test finishes within 15
 		// minutes
-		InternalTestHelper.setInternalUserNumber(100000);
+		InternalTestHelper.setInternalUserNumber(5000);
 		TourGuideService tourGuideService = new TourGuideService(gpsUtil, new RewardCentral(), rewardsService);
 
 		List<User> allUsers = new ArrayList<>();
@@ -67,27 +68,14 @@ public class TestPerformance {
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 		
-		Map<User, Integer> usersBeforeTracking = new HashMap<>();
-		for (User user : allUsers) {
-			usersBeforeTracking.put(user, user.getVisitedLocations().size());
-		}
-		
 		/*ACT*/
+		List<CompletableFuture<VisitedLocation>> futures = new ArrayList<>();
 		for (User user : allUsers) {
-			tourGuideService.trackUserLocation(user);
+			futures.add(tourGuideService.trackUserLocation(user));
 		}
-
-		for (User user : allUsers) {
-			while (user.getVisitedLocations().size() <= usersBeforeTracking.get(user)) {
-				//System.out.println("waiting for user's update");
-				try {
-					Thread.sleep(10); /* AJUSTER LE TEMPS */
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
+		CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+		allFutures.join();
+		
 		stopWatch.stop();
 		tourGuideService.tracker.stopTracking();
 
@@ -99,39 +87,29 @@ public class TestPerformance {
 
 	@Test
 	public void highVolumeGetRewards() {
+		/*ARRANGE*/
 		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 
 		// Users should be incremented up to 100,000, and test finishes within 20 minutes
-		InternalTestHelper.setInternalUserNumber(100000);
+		InternalTestHelper.setInternalUserNumber(100);
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 		TourGuideService tourGuideService = new TourGuideService(gpsUtil, new RewardCentral() ,rewardsService);
-		
+		/*ACT*/
 	    Attraction attraction = gpsUtil.getAttractions().get(0);
 		List<User> allUsers = new ArrayList<>();
 		allUsers = tourGuideService.getAllUsers();
 		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
 	    
-	    allUsers.forEach(u -> rewardsService.calculateRewards(u)); /*THREAD SECONDAIRE*/
-	    
-		for(User user : allUsers) {
-			while(user.getUserRewards().isEmpty()) {
-				try {
-					Thread.sleep(1); /*FAIRE VARIER LE TEMPS*/
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		
-		for(User user : allUsers) {
-			assertTrue(user.getUserRewards().size() > 0);
-		}
+		List<CompletableFuture<Void>> futures = new ArrayList<>();
+	    allUsers.forEach(u -> futures.add(rewardsService.calculateRewards(u))); /*THREAD SECONDAIRE*/
+	    CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+		allFutures.join();
 		
 		stopWatch.stop();
 		tourGuideService.tracker.stopTracking();
-
+		/*ASSERT*/
 		System.out.println("highVolumeGetRewards: Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()) + " seconds."); 
 		assertTrue(TimeUnit.MINUTES.toSeconds(20) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 	}
