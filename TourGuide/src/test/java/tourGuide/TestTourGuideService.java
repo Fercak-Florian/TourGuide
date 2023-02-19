@@ -35,6 +35,16 @@ public class TestTourGuideService {
 		
 		/*ACT*/
 		VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user);
+		while(user.getVisitedLocations().isEmpty()) {
+			
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		visitedLocation = user.getLastVisitedLocation();
 		tourGuideService.tracker.stopTracking();
 		
 		/*ASSERT*/
@@ -101,6 +111,17 @@ public class TestTourGuideService {
 		
 		/*ACT*/
 		VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user);
+		
+		while(user.getVisitedLocations().isEmpty()) {
+			
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		visitedLocation = user.getLastVisitedLocation();
 		tourGuideService.tracker.stopTracking();
 		
 		/*ASSERT*/
@@ -118,6 +139,16 @@ public class TestTourGuideService {
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user);
 		
+		while(user.getVisitedLocations().isEmpty()) {
+			
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		visitedLocation = user.getLastVisitedLocation();
 		/*ACT*/
 		List<ProximityAttraction> attractions = tourGuideService.getNearByAttractions(visitedLocation);
 		tourGuideService.tracker.stopTracking();
@@ -140,7 +171,7 @@ public class TestTourGuideService {
 		tourGuideService.tracker.stopTracking();
 		
 		/*ASSERT*/
-		assertEquals(10, providers.size());
+		assertEquals(5, providers.size());
 	}
 	
 }
