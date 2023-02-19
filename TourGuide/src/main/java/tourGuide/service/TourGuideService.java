@@ -106,7 +106,7 @@ public class TourGuideService {
 			user.addToVisitedLocations(v);
 			rewardsService.calculateRewards(user);
 		});
-		visitedLocation = user.getLastVisitedLocation();
+		//visitedLocation = user.getLastVisitedLocation();
 		return visitedLocation;
 	}
 
