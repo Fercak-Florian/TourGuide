@@ -11,6 +11,8 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -100,9 +102,10 @@ public class TourGuideService {
 		return providers;
 	}
 	
+	Executor executor = Executors.newFixedThreadPool(100);
 	public VisitedLocation trackUserLocation(User user) {
 		VisitedLocation visitedLocation = null;
-		CompletableFuture.supplyAsync(() -> gpsUtil.getUserLocation(user.getUserId())).thenAccept(v -> {
+		CompletableFuture.supplyAsync(() -> gpsUtil.getUserLocation(user.getUserId()), executor).thenAccept(v -> {
 			user.addToVisitedLocations(v);
 			rewardsService.calculateRewards(user);
 		});
