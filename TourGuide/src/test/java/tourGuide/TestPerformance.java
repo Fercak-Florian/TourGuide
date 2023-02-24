@@ -99,6 +99,7 @@ public class TestPerformance {
 
 	@Test
 	public void highVolumeGetRewards() {
+		/*ARRANGE*/
 		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 
@@ -112,7 +113,8 @@ public class TestPerformance {
 		List<User> allUsers = new ArrayList<>();
 		allUsers = tourGuideService.getAllUsers();
 		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
-	    
+
+		/*ACT*/
 	    allUsers.forEach(u -> rewardsService.calculateRewards(u)); /*THREAD SECONDAIRE*/
 	    
 		for(User user : allUsers) {
@@ -132,6 +134,7 @@ public class TestPerformance {
 		stopWatch.stop();
 		tourGuideService.tracker.stopTracking();
 
+		/*ASSERT*/
 		System.out.println("highVolumeGetRewards: Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()) + " seconds."); 
 		assertTrue(TimeUnit.MINUTES.toSeconds(20) >= TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()));
 	}

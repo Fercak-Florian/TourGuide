@@ -2,6 +2,8 @@ package tourGuide.service;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.springframework.stereotype.Service;
 
@@ -23,7 +25,7 @@ public class RewardsService {
 	private int attractionProximityRange = 200;
 	private final GpsUtil gpsUtil;
 	private final RewardCentral rewardsCentral;
-	
+
 	public RewardsService(GpsUtil gpsUtil, RewardCentral rewardCentral) {
 		this.gpsUtil = gpsUtil;
 		this.rewardsCentral = rewardCentral;
@@ -36,17 +38,17 @@ public class RewardsService {
 	public void setDefaultProximityBuffer() {
 		proximityBuffer = defaultProximityBuffer;
 	}
-	
+
+	Executor executor = Executors.newFixedThreadPool(100);
 	public void calculateRewards(User user) {
 		List<VisitedLocation> userLocations = user.getVisitedLocations();
 		List<Attraction> attractions = gpsUtil.getAttractions();
-		//Executor executor = Executors.newFixedThreadPool(10);
 		for(VisitedLocation visitedLocation : userLocations) {
 			for(Attraction attraction : attractions) {
 				if(user.getUserRewards().stream().filter(r -> r.attraction.attractionName.equals(attraction.attractionName)).count() == 0) {
 					if(nearAttraction(visitedLocation, attraction)) {
 						/*ENVIRON 1 SECONDE PASSEE DANS getRewardPoints -> TEMPS INCOMPRESSIBLE*/
-						CompletableFuture.supplyAsync(() -> getRewardPoints(attraction, user)/*, executor*/)
+						CompletableFuture.supplyAsync(() -> getRewardPoints(attraction, user), executor)
 						.thenAccept(rewards -> {
 							user.addUserReward(new UserReward(visitedLocation, attraction, rewards));
 						});
