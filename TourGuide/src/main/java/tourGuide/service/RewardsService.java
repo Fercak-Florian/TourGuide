@@ -47,7 +47,7 @@ public class RewardsService {
 	}
 
 	public void calculateRewards1(User user) {
-		System.out.println("calculateRewards1");
+		//System.out.println("calculateRewards1");
 		List<VisitedLocation> userLocations = user.getVisitedLocations();
 		CompletableFuture.supplyAsync(() -> gpsUtil.getAttractions(), executor).thenAccept(attractions -> {
 			for (VisitedLocation visitedLocation : userLocations) {
@@ -65,6 +65,7 @@ public class RewardsService {
 	}
 
 	public void calculateRewards2(User user) {
+		//System.out.println("calculateRewards2");
 		List<VisitedLocation> userLocations = user.getVisitedLocations();
 		List<Attraction> attractions = gpsUtil.getAttractions();
 		for (VisitedLocation visitedLocation : userLocations) {
