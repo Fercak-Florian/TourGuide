@@ -1,6 +1,8 @@
 package tourGuide.tracker;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -44,9 +46,29 @@ public class Tracker extends Thread {
 			
 			List<User> users = tourGuideService.getAllUsers();
 			logger.debug("Begin Tracker. Tracking " + users.size() + " users.");
+
 			stopWatch.start();
+
+			Map<User, Integer> usersBeforeTracking = new HashMap<>();
+			for(User user : users){
+				usersBeforeTracking.put(user, user.getVisitedLocations().size());
+			}
+
 			users.forEach(u -> tourGuideService.trackUserLocation(u));
+
+			for(User user : users){
+				while(user.getVisitedLocations().size() <= usersBeforeTracking.get(user)){
+					/*waiting*/
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e) {
+						throw new RuntimeException(e);
+					}
+				}
+			}
+
 			stopWatch.stop();
+
 			logger.debug("Tracker Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()) + " seconds."); 
 			stopWatch.reset();
 			try {
@@ -56,6 +78,5 @@ public class Tracker extends Thread {
 				break;
 			}
 		}
-		
 	}
 }
