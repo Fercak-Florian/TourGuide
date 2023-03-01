@@ -44,7 +44,7 @@ public class TestRewardsService {
 		/*ACT*/
 		tourGuideService.trackUserLocation(user);
 		
-		/*ATTENTE DE MODIFICATION DU USER PAR LE THEAD SEPARE*/
+		/*WAITING FOR ACT*/
 		while(user.getUserRewards().isEmpty()) {
 			try {
 				Thread.sleep(600);
@@ -67,20 +67,33 @@ public class TestRewardsService {
 		assertTrue(rewardsService.isWithinAttractionProximity(attraction, attraction));
 	}
 	
-	@Ignore // Needs fixed - can throw ConcurrentModificationException
 	@Test
 	public void nearAllAttractions() {
+		/*ARRANGE*/
 		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 		rewardsService.setProximityBuffer(Integer.MAX_VALUE);
 
 		InternalTestHelper.setInternalUserNumber(1);
 		TourGuideService tourGuideService = new TourGuideService(gpsUtil, new RewardCentral(), rewardsService);
-		
-		rewardsService.calculateRewards(tourGuideService.getAllUsers().get(0));
-		List<UserReward> userRewards = tourGuideService.getUserRewards(tourGuideService.getAllUsers().get(0));
+
+		User user = tourGuideService.getAllUsers().get(0);
+
+		/*ACT*/
+		rewardsService.calculateRewards(user);
+
+		/*WAITING FOR ACT*/
+		while(user.getUserRewards().size() < gpsUtil.getAttractions().size()){
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		List<UserReward> userRewards = tourGuideService.getUserRewards(user);
 		tourGuideService.tracker.stopTracking();
 
+		/*ASSERT*/
 		assertEquals(gpsUtil.getAttractions().size(), userRewards.size());
 	}
 	

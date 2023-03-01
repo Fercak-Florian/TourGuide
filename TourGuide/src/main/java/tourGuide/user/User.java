@@ -86,7 +86,7 @@ public class User {
 	public void addUserReward(UserReward userReward) {
 		lock.lock();
 		try {
-			if (userRewards.stream().filter(r -> !r.attraction.attractionName.equals(userReward.attraction))
+			if (userRewards.stream().filter(r -> r.attraction.attractionName.equals(userReward.attraction.attractionName))
 					.count() == 0) {
 				userRewards.add(userReward);
 			}
