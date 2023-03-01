@@ -34,7 +34,7 @@ public class TestTourGuideService {
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		
 		/*ACT*/
-		VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user);
+		tourGuideService.trackUserLocation(user);
 		while(user.getVisitedLocations().isEmpty()) {
 			
 			try {
@@ -44,7 +44,7 @@ public class TestTourGuideService {
 				e.printStackTrace();
 			}
 		}
-		visitedLocation = user.getLastVisitedLocation();
+		VisitedLocation visitedLocation = user.getLastVisitedLocation();
 		tourGuideService.tracker.stopTracking();
 		
 		/*ASSERT*/
@@ -110,7 +110,7 @@ public class TestTourGuideService {
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		
 		/*ACT*/
-		VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user);
+		tourGuideService.trackUserLocation(user);
 		
 		while(user.getVisitedLocations().isEmpty()) {
 			
@@ -121,7 +121,7 @@ public class TestTourGuideService {
 				e.printStackTrace();
 			}
 		}
-		visitedLocation = user.getLastVisitedLocation();
+		VisitedLocation visitedLocation = user.getLastVisitedLocation();
 		tourGuideService.tracker.stopTracking();
 		
 		/*ASSERT*/
@@ -137,7 +137,7 @@ public class TestTourGuideService {
 		TourGuideService tourGuideService = new TourGuideService(gpsUtil, new RewardCentral(), rewardsService);
 		
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
-		VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user);
+		tourGuideService.trackUserLocation(user);
 		
 		while(user.getVisitedLocations().isEmpty()) {
 			
@@ -148,7 +148,7 @@ public class TestTourGuideService {
 				e.printStackTrace();
 			}
 		}
-		visitedLocation = user.getLastVisitedLocation();
+		VisitedLocation visitedLocation = user.getLastVisitedLocation();
 		/*ACT*/
 		List<ProximityAttraction> attractions = tourGuideService.getNearByAttractions(visitedLocation);
 		tourGuideService.tracker.stopTracking();
