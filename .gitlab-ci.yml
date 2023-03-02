@@ -25,6 +25,6 @@ test-job:
  stage: Test
  script:
    - echo "Testing the code..."
-   #- ./gradlew check
+   - ./gradlew check
    
 
