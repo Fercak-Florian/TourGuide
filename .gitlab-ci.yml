@@ -21,7 +21,7 @@ build-job:
   stage: Build
   script:
     - echo "Compiling the code..."
-    - ./gradlew bootJar
+    - gradle bootJar
   artifacts:
     paths:
       - "build/libs/*.jar"
