@@ -7,6 +7,9 @@ workflow:
 # name of the Docker image, the Docker executor uses to run CI/CD jobs
 image: openjdk:17-alpine
 
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
 before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
 
