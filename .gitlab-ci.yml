@@ -1,11 +1,4 @@
-workflow:
-  rules:
-    - if: $CI_COMMIT_TAG
-      when: never
-    - if: $CI_COMMIT_BRANCH == 'develop'
-
-# name of the Docker image, the Docker executor uses to run CI/CD jobs
-image: openjdk:17-alpine
+image: gradle:alpine
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
@@ -14,23 +7,25 @@ before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
 
 stages:
-  - "Build"
-  - "Test"
+  - build
+  - test
 
-build-job:
-  stage: Build
-  script:
-    - echo "Compiling the code..."
-    - gradle bootJar
-  artifacts:
+build:
+  stage: build
+  script: ./gradlew bootJar
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: push
     paths:
-      - "build/libs/*.jar"
-    when: on_success
+      - build
+      - .gradle
 
-test-job:
- stage: Test
- script:
-   - echo "Testing the code..."
-   #- ./gradlew check
-   
-
+test:
+  stage: test
+  script: ./gradlew check
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
