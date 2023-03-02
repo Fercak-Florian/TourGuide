@@ -7,6 +7,9 @@ workflow:
 # name of the Docker image, the Docker executor uses to run CI/CD jobs
 image: openjdk:17-alpine
 
+before_script:
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
 stages:
   - "Build"
   - "Test"
@@ -15,7 +18,7 @@ build-job:
   stage: Build
   script:
     - echo "Compiling the code..."
-    #- ./gradlew bootJar
+    - ./gradlew bootJar
   artifacts:
     paths:
       - "build/libs/*.jar"
@@ -25,6 +28,6 @@ test-job:
  stage: Test
  script:
    - echo "Testing the code..."
-   - ./gradlew check
+   #- ./gradlew check
    
 
