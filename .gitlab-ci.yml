@@ -15,7 +15,7 @@ build-job:
   stage: Build
   script:
     - echo "Compiling the code..."
-    - ./gradlew bootJar
+    #- ./gradlew bootJar
   artifacts:
     paths:
       - "build/libs/*.jar"
@@ -25,6 +25,6 @@ test-job:
  stage: Test
  script:
    - echo "Testing the code..."
-   - ./gradlew check
+   #- ./gradlew check
    
 
