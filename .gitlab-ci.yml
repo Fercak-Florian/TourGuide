@@ -1,0 +1,30 @@
+workflow:
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never
+    - if: $CI_COMMIT_BRANCH == 'develop'
+
+# name of the Docker image, the Docker executor uses to run CI/CD jobs
+image: openjdk:17-alpine
+
+stages:
+  - "Build"
+  - "Test"
+
+build-job:
+  stage: Build
+  script:
+    - echo "Compiling the code..."
+    #- ./gradlew bootJar
+  artifacts:
+    paths:
+      - "build/libs/*.jar"
+    when: on_success
+
+test-job:
+ stage: Test
+ script:
+   - echo "Testing the code..."
+   - ./gradlew check
+   
+
