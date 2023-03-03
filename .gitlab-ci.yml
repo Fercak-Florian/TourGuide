@@ -1,31 +1,25 @@
-image: gradle:alpine
+# name of the Docker image, the Docker executor uses to run CI/CD jobs
+image: openjdk:17-alpine
 
-variables:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-
-before_script:
-  - export GRADLE_USER_HOME=`pwd`/.gradle
-
+# Stages, which define when to run the jobs. For example, stages that run tests after stages that compile the code.
 stages:
-  - build
-  - test
-
+  - Build
+  - Test
+    
+# build job in Build stage
 build:
-  stage: build
-  script: ./gradlew bootJar
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: push
+  stage: Build
+  script:
+    - ./gradlew bootJar
+# The paths keyword determines which files to add to the job artifacts. All paths to files and directories are relative to the repository where the job was created.
+  artifacts:
     paths:
-      - build
-      - .gradle
-
+      - build/libs/*.jar
+    
+# test job in Test stage
 test:
-  stage: test
-  script: ./gradlew check
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
-    policy: pull
-    paths:
-      - build
-      - .gradle
+  stage: Test
+  needs:
+    - build
+  script:
+    - ./gradlew check
