@@ -23,4 +23,5 @@ test:
   needs:
     - build
   script:
+    echo $PATH
     - ./gradlew check
