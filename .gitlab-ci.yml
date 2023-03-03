@@ -10,7 +10,7 @@ stages:
 build:
   stage: Build
   script:
-    which gradlew
+    ./gradlew
 # The paths keyword determines which files to add to the job artifacts. All paths to files and directories are relative to the repository where the job was created.
   artifacts:
     paths:
@@ -22,5 +22,4 @@ test:
   needs:
     - build
   script:
-    echo $PATH
-    - ./gradlew check
+    ./gradlew check
