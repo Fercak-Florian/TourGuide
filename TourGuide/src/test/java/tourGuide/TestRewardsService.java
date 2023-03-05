@@ -94,7 +94,7 @@ public class TestRewardsService {
 				throw new RuntimeException(e);
 			}
 		}
-		List<UserReward> userRewards = tourGuideService.getUserRewards(user);
+		List<UserReward> userRewards = user.getUserRewards();
 		tourGuideService.tracker.stopTracking();
 
 		/*ASSERT*/

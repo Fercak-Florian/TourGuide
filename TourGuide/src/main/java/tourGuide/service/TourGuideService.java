@@ -48,10 +48,6 @@ public class TourGuideService {
 		addShutDownHook();
 	}
 
-	public List<UserReward> getUserRewards(User user) {
-		return user.getUserRewards();
-	}
-
 	public VisitedLocation getUserLocation(User user) {
 		if (user.getVisitedLocations().isEmpty()) {
 			trackUserLocation(user);

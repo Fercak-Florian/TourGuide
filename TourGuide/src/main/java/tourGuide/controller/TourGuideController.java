@@ -16,11 +16,13 @@ import tripPricer.Provider;
 
 @RestController
 public class TourGuideController {
-
-	@Autowired
 	TourGuideService tourGuideService;
-	@Autowired
 	UserService userService;
+
+	public TourGuideController(TourGuideService tourGuideService, UserService userService){
+		this.tourGuideService = tourGuideService;
+		this.userService = userService;
+	}
 
 	@GetMapping("/")
 	public String index() {
@@ -31,7 +33,7 @@ public class TourGuideController {
 	public String getLocation(@RequestParam String userName) {
 		VisitedLocation visitedLocation = tourGuideService.getUserLocation(userService.getUser(userName));
 		if(visitedLocation == null) {
-			return "";
+			return "{}";
 		} else {
 			return JsonStream.serialize(visitedLocation.location);
 		}
@@ -45,7 +47,9 @@ public class TourGuideController {
 
 	@GetMapping("/getRewards")
 	public String getRewards(@RequestParam String userName) {
-		return JsonStream.serialize(tourGuideService.getUserRewards(userService.getUser(userName)));
+		User user = userService.getUser(userName);
+		return JsonStream.serialize(user.getUserRewards());
+
 	}
 
 	@GetMapping("/getAllCurrentLocations")
@@ -58,8 +62,4 @@ public class TourGuideController {
 		List<Provider> providers = tourGuideService.getTripDeals(userService.getUser(userName));
 		return JsonStream.serialize(providers);
 	}
-
-	/*private User getUser(String userName) {
-		return tourGuideService.getUser(userName);
-	}*/
 }
