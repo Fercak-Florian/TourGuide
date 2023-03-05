@@ -18,10 +18,13 @@ import rewardCentral.RewardCentral;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.service.RewardsService;
 import tourGuide.service.TourGuideService;
+import tourGuide.service.UserService;
 import tourGuide.user.User;
 import tourGuide.user.UserReward;
 
 public class TestRewardsService {
+
+	UserService userService = new UserService();
 	
 	@Before
 	public void init() {
@@ -71,13 +74,14 @@ public class TestRewardsService {
 	public void nearAllAttractions() {
 		/*ARRANGE*/
 		GpsUtil gpsUtil = new GpsUtil();
+		UserService userService = new UserService();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 		rewardsService.setProximityBuffer(Integer.MAX_VALUE);
 
 		InternalTestHelper.setInternalUserNumber(1);
 		TourGuideService tourGuideService = new TourGuideService(gpsUtil, new RewardCentral(), rewardsService);
 
-		User user = tourGuideService.getAllUsers().get(0);
+		User user = userService.getAllUsers().get(0);
 
 		/*ACT*/
 		rewardsService.calculateRewards(user);

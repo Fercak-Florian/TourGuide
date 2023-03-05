@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jsoniter.output.JsonStream;
 import gpsUtil.location.VisitedLocation;
 import tourGuide.service.TourGuideService;
+import tourGuide.service.UserService;
 import tourGuide.user.User;
 import tourGuide.utils.ProximityAttraction;
 import tourGuide.utils.UserMostRecentLocation;
@@ -18,6 +19,8 @@ public class TourGuideController {
 
 	@Autowired
 	TourGuideService tourGuideService;
+	@Autowired
+	UserService userService;
 
 	@GetMapping("/")
 	public String index() {
@@ -26,7 +29,7 @@ public class TourGuideController {
 
 	@GetMapping("/getLocation")
 	public String getLocation(@RequestParam String userName) {
-		VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
+		VisitedLocation visitedLocation = tourGuideService.getUserLocation(userService.getUser(userName));
 		if(visitedLocation == null) {
 			return "";
 		} else {
@@ -36,13 +39,13 @@ public class TourGuideController {
 
 	@GetMapping("/getNearbyAttractions")
 	public List<ProximityAttraction> getNearbyAttractions(@RequestParam String userName) {
-		VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
+		VisitedLocation visitedLocation = tourGuideService.getUserLocation(userService.getUser(userName));
 		return tourGuideService.getNearByAttractions(visitedLocation);
 	}
 
 	@GetMapping("/getRewards")
 	public String getRewards(@RequestParam String userName) {
-		return JsonStream.serialize(tourGuideService.getUserRewards(getUser(userName)));
+		return JsonStream.serialize(tourGuideService.getUserRewards(userService.getUser(userName)));
 	}
 
 	@GetMapping("/getAllCurrentLocations")
@@ -52,11 +55,11 @@ public class TourGuideController {
 
 	@GetMapping("/getTripDeals")
 	public String getTripDeals(@RequestParam String userName) {
-		List<Provider> providers = tourGuideService.getTripDeals(getUser(userName));
+		List<Provider> providers = tourGuideService.getTripDeals(userService.getUser(userName));
 		return JsonStream.serialize(providers);
 	}
 
-	private User getUser(String userName) {
+	/*private User getUser(String userName) {
 		return tourGuideService.getUser(userName);
-	}
+	}*/
 }
