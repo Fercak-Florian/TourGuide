@@ -4,15 +4,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import gpsUtil.location.VisitedLocation;
 import tripPricer.Provider;
 
 public class User {
-	private final UUID userId;
-	private final String userName;
+	private final UUID USER_ID;
+	private final String USER_NAME;
 	private String phoneNumber;
 	private String emailAddress;
 	private Date latestLocationTimestamp;
@@ -23,18 +22,18 @@ public class User {
 	private ReentrantLock lock = new ReentrantLock();
 
 	public User(UUID userId, String userName, String phoneNumber, String emailAddress) {
-		this.userId = userId;
-		this.userName = userName;
+		this.USER_ID = userId;
+		this.USER_NAME = userName;
 		this.phoneNumber = phoneNumber;
 		this.emailAddress = emailAddress;
 	}
 
 	public UUID getUserId() {
-		return userId;
+		return USER_ID;
 	}
 
 	public String getUserName() {
-		return userName;
+		return USER_NAME;
 	}
 
 	public void setPhoneNumber(String phoneNumber) {
@@ -86,7 +85,7 @@ public class User {
 	public void addUserReward(UserReward userReward) {
 		lock.lock();
 		try {
-			if (userRewards.stream().filter(r -> r.attraction.attractionName.equals(userReward.attraction.attractionName))
+			if (userRewards.stream().filter(r -> r.ATTRACTION.attractionName.equals(userReward.ATTRACTION.attractionName))
 					.count() == 0) {
 				userRewards.add(userReward);
 			}

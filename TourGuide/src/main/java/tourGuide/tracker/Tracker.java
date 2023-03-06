@@ -19,17 +19,17 @@ import tourGuide.user.User;
 public class Tracker extends Thread {
 	private Logger logger = LoggerFactory.getLogger(Tracker.class);
 	private static final long TRACKING_POLLING_INTERVAL = TimeUnit.MINUTES.toSeconds(5);
-	private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-	private final TourGuideService tourGuideService;
+	private final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
+	private final TourGuideService TOUR_GUIDE_SERVICE;
 	private boolean stop = false;
 
 	@Autowired
 	UserService userService;
 
 	public Tracker(TourGuideService tourGuideService) {
-		this.tourGuideService = tourGuideService;
+		this.TOUR_GUIDE_SERVICE = tourGuideService;
 		
-		executorService.submit(this);
+		EXECUTOR_SERVICE.submit(this);
 	}
 	
 	/**
@@ -37,7 +37,7 @@ public class Tracker extends Thread {
 	 */
 	public void stopTracking() {
 		stop = true;
-		executorService.shutdownNow();
+		EXECUTOR_SERVICE.shutdownNow();
 	}
 	
 	@Override
@@ -59,7 +59,7 @@ public class Tracker extends Thread {
 				usersBeforeTracking.put(user, user.getVisitedLocations().size());
 			}
 
-			users.forEach(u -> tourGuideService.trackUserLocation(u));
+			users.forEach(u -> TOUR_GUIDE_SERVICE.trackUserLocation(u));
 
 			for(User user : users){
 				while(user.getVisitedLocations().size() <= usersBeforeTracking.get(user)){
@@ -74,7 +74,7 @@ public class Tracker extends Thread {
 
 			stopWatch.stop();
 
-			logger.debug("Tracker Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()) + " seconds."); 
+			logger.debug("Tracker Time Elapsed: " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.getTime()) + " seconds.");
 			stopWatch.reset();
 			try {
 				logger.debug("Tracker sleeping");
