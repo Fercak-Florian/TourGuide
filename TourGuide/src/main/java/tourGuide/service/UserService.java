@@ -17,14 +17,14 @@ import java.util.stream.IntStream;
 public class UserService {
 
     boolean testMode = true;
-    private final Logger logger = LoggerFactory.getLogger(TourGuideService.class);/*UserService.class*/
+    private final Logger LOGGER = LoggerFactory.getLogger(TourGuideService.class);/*UserService.class*/
 
     public UserService(){
         if (testMode) {
-            logger.info("TestMode enabled");
-            logger.debug("Initializing users");
+            LOGGER.info("TestMode enabled");
+            LOGGER.debug("Initializing users");
             initializeInternalUsers();
-            logger.debug("Finished initializing users");
+            LOGGER.debug("Finished initializing users");
         }
     }
 
@@ -63,7 +63,7 @@ public class UserService {
 
             internalUserMap.put(userName, user);
         });
-        logger.debug("Created " + InternalTestHelper.getInternalUserNumber() + " internal test users.");
+        LOGGER.debug("Created " + InternalTestHelper.getInternalUserNumber() + " internal test users.");
     }
 
     private void generateUserLocationHistory(User user) {

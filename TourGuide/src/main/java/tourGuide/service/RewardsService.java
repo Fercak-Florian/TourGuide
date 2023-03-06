@@ -21,13 +21,13 @@ public class RewardsService {
 	private int defaultProximityBuffer = 10;
 	private int proximityBuffer = defaultProximityBuffer;
 	private int attractionProximityRange = 200;
-	private final GpsUtil gpsUtil;
-	private final RewardCentral rewardsCentral;
-	Executor executor = Executors.newFixedThreadPool(100);
+	private final GpsUtil GPS_UTIL;
+	private final RewardCentral REWARD_CENTRAL;
+	private Executor executor = Executors.newFixedThreadPool(100);
 
 	public RewardsService(GpsUtil gpsUtil, RewardCentral rewardCentral) {
-		this.gpsUtil = gpsUtil;
-		this.rewardsCentral = rewardCentral;
+		this.GPS_UTIL = gpsUtil;
+		this.REWARD_CENTRAL = rewardCentral;
 	}
 
 	public void setProximityBuffer(int proximityBuffer) {
@@ -40,11 +40,11 @@ public class RewardsService {
 
 	public void calculateRewards(User user) {
 		List<VisitedLocation> userLocations = user.getVisitedLocations();
-		CompletableFuture.supplyAsync(() -> gpsUtil.getAttractions(), executor).thenAccept(attractions -> {
+		CompletableFuture.supplyAsync(() -> GPS_UTIL.getAttractions(), executor).thenAccept(attractions -> {
 			for (VisitedLocation visitedLocation : userLocations) {
 				for (Attraction attraction : attractions) {
 					if (user.getUserRewards().stream()
-							.filter(r -> r.attraction.attractionName.equals(attraction.attractionName)).count() == 0) {
+							.filter(r -> r.ATTRACTION.attractionName.equals(attraction.attractionName)).count() == 0) {
 						if (nearAttraction(visitedLocation, attraction)) {
 							user.addUserReward(
 									new UserReward(visitedLocation, attraction, getRewardPoints(attraction, user)));
@@ -56,7 +56,7 @@ public class RewardsService {
 	}
 
 	private int getRewardPoints(Attraction attraction, User user) {
-		return rewardsCentral.getAttractionRewardPoints(attraction.attractionId, user.getUserId());
+		return REWARD_CENTRAL.getAttractionRewardPoints(attraction.attractionId, user.getUserId());
 	}
 
 	public boolean isWithinAttractionProximity(Attraction attraction, Location location) {

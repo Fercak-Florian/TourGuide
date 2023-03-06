@@ -29,19 +29,19 @@ public class TourGuideService {
 	@Autowired
 	UserService userService;
 
-	private final GpsUtil gpsUtil;
-	private final RewardCentral rewardCentral;
-	private final RewardsService rewardsService;
-	private final TripPricer tripPricer = new TripPricer();
+	private final GpsUtil GPS_UTIL;
+	private final RewardCentral REWARD_CENTRAL;
+	private final RewardsService REWARD_SERVICE;
+	private final TripPricer TRIP_PRICER = new TripPricer();
 	public final Tracker tracker;
-	private static final String tripPricerApiKey = "test-server-api-key";
+	private static final String TRIP_PRICER_API_KEY = "test-server-api-key";
 
-	Executor executor = Executors.newFixedThreadPool(100);
+	private Executor executor = Executors.newFixedThreadPool(100);
 
 	public TourGuideService(GpsUtil gpsUtil, RewardCentral rewardCentral, RewardsService rewardsService) {
-		this.gpsUtil = gpsUtil;
-		this.rewardCentral = rewardCentral;
-		this.rewardsService = rewardsService;
+		this.GPS_UTIL = gpsUtil;
+		this.REWARD_CENTRAL = rewardCentral;
+		this.REWARD_SERVICE = rewardsService;
 
 
 		tracker = new Tracker(this);
@@ -69,7 +69,7 @@ public class TourGuideService {
 
 	public List<Provider> getTripDeals(User user) {
 		int cumulativeRewardPoints = user.getUserRewards().stream().mapToInt(i -> i.getRewardPoints()).sum();
-		List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(),
+		List<Provider> providers = TRIP_PRICER.getPrice(TRIP_PRICER_API_KEY, user.getUserId(),
 				user.getUserPreferences().getNumberOfAdults(), user.getUserPreferences().getNumberOfChildren(),
 				user.getUserPreferences().getTripDuration(), cumulativeRewardPoints);
 		user.setTripDeals(providers);
@@ -77,22 +77,22 @@ public class TourGuideService {
 	}
 
 	public void trackUserLocation(User user) {
-		CompletableFuture.supplyAsync(() -> gpsUtil.getUserLocation(user.getUserId()), executor).thenAccept(v -> {
+		CompletableFuture.supplyAsync(() -> GPS_UTIL.getUserLocation(user.getUserId()), executor).thenAccept(v -> {
 			user.addToVisitedLocations(v);
-			rewardsService.calculateRewards(user);
+			REWARD_SERVICE.calculateRewards(user);
 		});
 	}
 
 	public List<ProximityAttraction> getNearByAttractions(VisitedLocation visitedLocation) {
 		Map<Attraction, Double> nearestAttractions = new HashMap<>();
 
-		for (Attraction attraction : gpsUtil.getAttractions()) {
-			nearestAttractions.put(attraction, rewardsService.getDistance(visitedLocation.location, attraction));
+		for (Attraction attraction : GPS_UTIL.getAttractions()) {
+			nearestAttractions.put(attraction, REWARD_SERVICE.getDistance(visitedLocation.location, attraction));
 		}
 		return (nearestAttractions.entrySet().stream().sorted(Entry.comparingByValue()).limit(5)
 				.map(t -> new ProximityAttraction(t.getKey().attractionName, t.getKey().latitude, t.getKey().longitude,
 						visitedLocation.location, t.getValue(),
-						rewardCentral.getAttractionRewardPoints(t.getKey().attractionId, visitedLocation.userId)))
+						REWARD_CENTRAL.getAttractionRewardPoints(t.getKey().attractionId, visitedLocation.userId)))
 				.collect(Collectors.toList()));
 	}
 
