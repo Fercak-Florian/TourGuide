@@ -10,11 +10,11 @@ stages:
 build:
   stage: Build
   script:
-    ./gradlew assemble
+    - sh TourGuide/gradlew assemble
 # The paths keyword determines which files to add to the job artifacts. All paths to files and directories are relative to the repository where the job was created.
   artifacts:
     paths:
-      - build/libs/*.jar
+      - TourGuide/build/libs/*.jar
     
 # test job in Test stage
 #test:
