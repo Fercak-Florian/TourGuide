@@ -1,30 +1,26 @@
-workflow:
-  rules:
-    - if: $CI_COMMIT_TAG
-      when: never
-    - if: $CI_COMMIT_BRANCH == 'develop'
-
 # name of the Docker image, the Docker executor uses to run CI/CD jobs
-image: openjdk:17-alpine
+image: openjdk:16-alpine
 
+# Stages, which define when to run the jobs. For example, stages that run tests after stages that compile the code.
 stages:
-  - "Build"
-  - "Test"
-
-build-job:
+  - Build
+  - Test
+    
+# build job in Build stage
+build:
   stage: Build
   script:
-    - echo "Compiling the code..."
-    #- ./gradlew bootJar
+    - cd TourGuide
+    - sh ./gradlew assemble
+# The paths keyword determines which files to add to the job artifacts. All paths to files and directories are relative to the repository where the job was created.
   artifacts:
     paths:
-      - "build/libs/*.jar"
-    when: on_success
-
-test-job:
- stage: Test
- script:
-   - echo "Testing the code..."
-   - ./gradlew check
-   
-
+      - TourGuide/build/libs/*.jar
+    
+# test job in Test stage
+#test:
+  #stage: Test
+  #needs:
+    #- build
+  #script:
+    #./gradlew check
