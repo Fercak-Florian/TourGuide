@@ -18,9 +18,8 @@ build:
       - TourGuide/build/libs/*.jar
     
 # test job in Test stage
-#test:
-  #stage: Test
-  #needs:
-    #- build
-  #script:
-    #./gradlew check
+test:
+  stage: Test
+  script:
+  - cd TourGuide
+  - sh ./gradlew check
