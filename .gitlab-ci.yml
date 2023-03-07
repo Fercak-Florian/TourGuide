@@ -21,5 +21,5 @@ build:
 test:
   stage: Test
   script:
-    - cd TourGuide
-    - sh ./gradlew check
+  - cd TourGuide
+  - sh ./gradlew check
