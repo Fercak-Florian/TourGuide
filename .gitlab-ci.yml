@@ -1,3 +1,9 @@
+workflow:
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never
+    - if: $CI_COMMIT_BRANCH == 'develop'
+
 # name of the Docker image, the Docker executor uses to run CI/CD jobs
 image: openjdk:16-alpine
 
@@ -23,3 +29,7 @@ test:
   script:
   - cd TourGuide
   - sh ./gradlew check
+  # The paths keyword determines which files to add to the job artifacts. All paths to files and directories are relative to the repository where the job was created.
+  artifacts:
+    paths:
+      - TourGuide/build/jacocoHtml/
