@@ -22,7 +22,7 @@ build:
   artifacts:
     paths:
       - TourGuide/build/libs/*.jar
-      - TourGuide/build/jacocoHtml
+      - TourGuide/build/jacocoHtml/index.html
     
 # test job in Test stage
 test:
