@@ -22,7 +22,6 @@ build:
   artifacts:
     paths:
       - TourGuide/build/libs/*.jar
-      - TourGuide/build/jacocoHtml/index.html
     
 # test job in Test stage
 test:
@@ -30,3 +29,7 @@ test:
   script:
   - cd TourGuide
   - sh ./gradlew check
+  # The paths keyword determines which files to add to the job artifacts. All paths to files and directories are relative to the repository where the job was created.
+  artifacts:
+    paths:
+      - TourGuide/build/jacocoHtml/
