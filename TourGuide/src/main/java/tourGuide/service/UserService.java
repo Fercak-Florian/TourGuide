@@ -7,19 +7,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.user.User;
+
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * This class is used to manage users relative to application tests
+ */
 @Service
 public class UserService {
 
     boolean testMode = true;
     private final Logger LOGGER = LoggerFactory.getLogger(TourGuideService.class);/*UserService.class*/
 
-    public UserService(){
+    public UserService() {
         if (testMode) {
             LOGGER.info("TestMode enabled");
             LOGGER.debug("Initializing users");
@@ -28,15 +32,30 @@ public class UserService {
         }
     }
 
+    /**
+     * This method is used to retrieve an internal user by his userName
+     *
+     * @param userName of type String
+     * @return user of type User
+     */
     public User getUser(String userName) {
         return internalUserMap.get(userName);
     }
 
-
+    /**
+     * This method is used to retrieve all the user generate by the application in cas of tests
+     *
+     * @return a List of User
+     */
     public List<User> getAllUsers() {
         return internalUserMap.values().stream().collect(Collectors.toList());
     }
 
+    /**
+     * This method is used to add a user into the application in cas of tests
+     *
+     * @param user of type User
+     */
     public void addUser(User user) {
         if (!internalUserMap.containsKey(user.getUserName())) {
             internalUserMap.put(user.getUserName(), user);
