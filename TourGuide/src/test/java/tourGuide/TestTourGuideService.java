@@ -36,12 +36,12 @@ public class TestTourGuideService {
 		
 		/*ACT*/
 		tourGuideService.trackUserLocation(user);
+
+		/*WAITING FOR ACT*/
 		while(user.getVisitedLocations().isEmpty()) {
-			
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -114,13 +114,12 @@ public class TestTourGuideService {
 		
 		/*ACT*/
 		tourGuideService.trackUserLocation(user);
-		
+
+		/*WAITING FOR ACT*/
 		while(user.getVisitedLocations().isEmpty()) {
-			
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -141,13 +140,12 @@ public class TestTourGuideService {
 		
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		tourGuideService.trackUserLocation(user);
-		
+
+		/*WAITING FOR ARRANGE*/
 		while(user.getVisitedLocations().isEmpty()) {
-			
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

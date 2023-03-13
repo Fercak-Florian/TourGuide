@@ -58,13 +58,9 @@ public class TestPerformance {
 		GpsUtil gpsUtil = new GpsUtil();
 		UserService userService = new UserService();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
-		// Users should be incremented up to 100,000, and test finishes within 15
-		// minutes
-		/*InternalTestHelper.setInternalUserNumber(100000);*/
 		TourGuideService tourGuideService = new TourGuideService(gpsUtil, new RewardCentral(), rewardsService);
 
-		List<User> allUsers = new ArrayList<>();
-		allUsers = userService.getAllUsers();
+		List<User> allUsers = userService.getAllUsers();
 
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
@@ -78,12 +74,11 @@ public class TestPerformance {
 		for (User user : allUsers) {
 			tourGuideService.trackUserLocation(user);
 		}
-
+		/*Waiting for user's update*/
 		for (User user : allUsers) {
 			while (user.getVisitedLocations().size() <= usersBeforeTracking.get(user)) {
-				//System.out.println("waiting for user's update");
 				try {
-					Thread.sleep(10); /* AJUSTER LE TEMPS */
+					Thread.sleep(10);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -106,24 +101,22 @@ public class TestPerformance {
 		UserService userService = new UserService();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 
-		// Users should be incremented up to 100,000, and test finishes within 20 minutes
-		/*InternalTestHelper.setInternalUserNumber(100000);*/
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 		TourGuideService tourGuideService = new TourGuideService(gpsUtil, new RewardCentral() ,rewardsService);
 		
 	    Attraction attraction = gpsUtil.getAttractions().get(0);
-		List<User> allUsers = new ArrayList<>();
-		allUsers = userService.getAllUsers();
+		List<User> allUsers = userService.getAllUsers();
 		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
 
 		/*ACT*/
-	    allUsers.forEach(u -> rewardsService.calculateRewards(u)); /*THREAD SECONDAIRE*/
-	    
+	    allUsers.forEach(u -> rewardsService.calculateRewards(u));
+
+		/*Waiting for user's update*/
 		for(User user : allUsers) {
 			while(user.getUserRewards().isEmpty()) {
 				try {
-					Thread.sleep(1); /*FAIRE VARIER LE TEMPS*/
+					Thread.sleep(1);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
